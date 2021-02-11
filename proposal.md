@@ -1,16 +1,13 @@
 # Proposal
-Game title : Artermis
-Here is where I describe what I am building.
+I am building a side scrolling rpg like game. It would contains simple battle.
 
 ## Needs to have
 - character movement
 - walking
-- close attack
-- far attack
 - simple map
 - monster
 
 ## Nice to have
 - dialogs
--
--
+- close attack
+- far attack
