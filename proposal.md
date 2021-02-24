@@ -1,5 +1,5 @@
 # Proposal
-I am building a side scrolling rpg like game. It would contains simple battle.
+I am building a side scrolling rpg like game called Sasha's hunt. It would contains simple battle.
 
 ## Needs to have
 - character movement
