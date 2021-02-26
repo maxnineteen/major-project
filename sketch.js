@@ -2,6 +2,12 @@
 // Maxine Zeng
 // Date
 
+//UI variables
+let heart;
+let question;
+let bk;
+let instruction = {isAlive: false};
+
 //display character and movement
 let characterSzie =  45;
 let characterPos;
@@ -24,6 +30,11 @@ let jumpPad;
 //objects = ground - height
 
 function preload(){
+  // loading UI image
+  heart = loadImage("assets/heart.png");
+  question = loadImage("assets/question mark.png");
+  bk = loadImage("assets/backgroud.jpg");
+
   //loading main character animation
   rightWalk = loadImage("assets/ranger archer/run/right run.gif");
   leftWalk = loadImage("assets/ranger archer/run/left run.gif");
@@ -43,23 +54,44 @@ function preload(){
 function setup() {
   createCanvas(windowWidth, windowHeight);
 
-  ground = height/4*3;
+  ground = height/4*3-5;
   jumpPad = {w:width/10, h:height/35};
 
   characterPos = {x: width/2, y: ground - characterSzie, dx: 0, dy: 0, 
                   ax: 0, ay: 0, speed: 4,};
-  characterImg = rightIdle;
+  characterImg = rightIdle; 
 }
 
 function draw() {
-  background(255);
-  colidCheck();       
+  background(bk);
+        
   fill("green");
-  noStroke();
+  strokeWeight(2.5);
   rect(width/3*2, height/3*2, width/10, height/35);
+  
+  for (let i=0; i<3; i++){
+    image(heart, 10 + i*30, 10, 20, 20);
+  }
+  image(question, width - 30, 10, 20, 20);
+  if (instruction.isAlive){
+    rect(width-100, 30, 50, 50);
+  }
 
+  //character displaying
+  walking(); 
   jumping();
   displayCharacter();
+} 
+
+function mouseClicked(){
+  // if (mouseX > width){
+    if (instruction.isAlive = true){
+      instruction.isAlive = false;  
+    }
+    else if (instruction.isAlive = false){
+      instruction.isAlive = true;  
+    }   
+  // }
 }
 
 function displayCharacter(){
@@ -84,13 +116,20 @@ function jumping(){
   characterPos.y += characterPos.dy;
 
   //gravity, if needed
-  if (characterPos.y < ground) {
+  if (characterPos.y <= ground) {
     characterPos.dy += 0.5;
   }
+  
+  else if (characterPos.y <= 500){
+    characterPos.ay = 0;
+  } 
+
   else {
     characterPos.y = ground;
     characterPos.dy = 0;
   }
+//rect(width/3*2, height/3*2, width/10, height/35);
+// windowHeight/3*2 + windowHeight/35
 
   //remove thrust from jump
   characterPos.ay = 0;
@@ -100,14 +139,15 @@ function jumping(){
 function keyPressed(){
   if (keyCode === 32){  //jump
     // characterPos.y -= characterPos.jumpheight;
-    characterPos.ay = -10;
+    characterPos.ay = -12;
     if (characterImg === rightWalk || characterImg === rightIdle){
       characterImg = rightJump; 
     } 
     if (characterImg === leftWalk || characterImg === leftIdle){
       characterImg = leftJump; 
-    }  
+    }
   }
+  
   if (keyCode === 68) {  //d left
     // characterPos.x += characterPos.speed;  
     characterImg = rightWalk;
@@ -134,7 +174,7 @@ function keyReleased(){
     if (characterImg === leftJump){
       characterImg = leftIdle;
     }
-  }
+  }       
   if (keyCode === 68) {  //d
     characterImg = rightIdle;
   }
@@ -152,7 +192,7 @@ function keyReleased(){
 }
 
 //other movement & coliding checking
-function colidCheck(){ 
+function walking(){ 
   if (keyIsDown(68)) {  //d left
     characterPos.x += characterPos.speed;  
     if (characterImg === leftJump){
@@ -169,28 +209,4 @@ function colidCheck(){
     }
     characterImg = leftWalk; 
   }
-  // if (characterPos.y >= ground - characterSzie){
-  //   characterPos.y = ground - characterSzie;
-  // }
 }
-
-          
-// function createEmptyCanvas(cols, rows){
-//   emptyArray = [];
-//   for (let y=0; y<rows; y++){
-//     emptyArray.push([]);
-//     for (let x=0; x<cols; x++){
-//       emptyArray[y].push(0);
-//     }
-//   }
-//   return emptyArray;
-// }
-
-// function displayMap(rows,cols){
-//   for (let y=0; y<rows; y++){
-//     for (let x=0; x<cols; x++){
-//       if 
-//     }
-//   }
-// }
-
