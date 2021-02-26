@@ -7,6 +7,7 @@ let heart;
 let question;
 let bk;
 let instruction = {isAlive: false};
+let instructionButton;
 
 //display character and movement
 let characterSzie =  45;
@@ -34,6 +35,7 @@ function preload(){
   heart = loadImage("assets/heart.png");
   question = loadImage("assets/question mark.png");
   bk = loadImage("assets/backgroud.jpg");
+  pixleFont = loadFont("assets/subway-ticker/SUBWT___.ttf"); 
 
   //loading main character animation
   rightWalk = loadImage("assets/ranger archer/run/right run.gif");
@@ -60,6 +62,18 @@ function setup() {
   characterPos = {x: width/2, y: ground - characterSzie, dx: 0, dy: 0, 
                   ax: 0, ay: 0, speed: 4,};
   characterImg = rightIdle; 
+
+  instructionButton = new Clickable();
+  instructionButton.locate(width - 30, 10);
+  instructionButton.resize(20,20);
+  instructionButton.text = " ";
+  instructionButton.strokeWeight = 0;
+  instructionButton.onHover = function(){
+    instruction.isAlive = true;
+  }
+  instructionButton.onOutside = function(){
+    instruction.isAlive = false;
+  }
 }
 
 function draw() {
@@ -72,10 +86,10 @@ function draw() {
   for (let i=0; i<3; i++){
     image(heart, 10 + i*30, 10, 20, 20);
   }
+  instructionButton.draw();
   image(question, width - 30, 10, 20, 20);
-  if (instruction.isAlive){
-    rect(width-100, 30, 50, 50);
-  }
+  instructions();
+  
 
   //character displaying
   walking(); 
@@ -83,15 +97,16 @@ function draw() {
   displayCharacter();
 } 
 
-function mouseClicked(){
-  // if (mouseX > width){
-    if (instruction.isAlive = true){
-      instruction.isAlive = false;  
-    }
-    else if (instruction.isAlive = false){
-      instruction.isAlive = true;  
-    }   
-  // }
+function instructions(){
+  // instruction.isAlive = true;
+  if (instruction.isAlive){
+    fill("#EAC381");
+    rect(width-200, 30, 170, 100);
+    fill("#1D1912");
+    textFont(pixleFont);
+    text("Use 'a', 'd', to move left or right and space to jump. ", width-190, 40, width-450, 200);
+    text("Use 'k' to attack. ", width-190, 100, width-450, 200);
+  }
 }
 
 function displayCharacter(){
@@ -120,9 +135,9 @@ function jumping(){
     characterPos.dy += 0.5;
   }
   
-  else if (characterPos.y <= 500){
-    characterPos.ay = 0;
-  } 
+  // if (characterPos.y <= 500){
+  //   characterPos.ay += 0.5;
+  // } 
 
   else {
     characterPos.y = ground;
@@ -199,7 +214,7 @@ function walking(){
       characterImg = leftJump;
     }
     else{
-      characterImg = rightWalk;
+      characterImg = rightWalk;     
     }
   }
   if (keyIsDown(65)) {  //a right
