@@ -5,9 +5,9 @@
 //UI variables
 let heart;
 let question;
-let bk;
 let instruction = {isAlive: false};
 let instructionButton;
+let pixleFont;
 
 //display character and movement
 let characterSzie =  45;
@@ -24,17 +24,22 @@ let leftCloseAttack;
 let rightJump;
 let leftJump;
 
-//map display variables
+//map and display variables
 let emptyArray;
 let ground;
+let bk;
 let jumpPad;
+
+//monster display variables
+let rightSlime;
+let leftSlime; 
+let slimePos;
 //objects = ground - height
 
 function preload(){
   // loading UI image
   heart = loadImage("assets/heart.png");
   question = loadImage("assets/question mark.png");
-  bk = loadImage("assets/backgroud.jpg");
   pixleFont = loadFont("assets/subway-ticker/SUBWT___.ttf"); 
 
   //loading main character animation
@@ -47,7 +52,12 @@ function preload(){
   rightJump = loadImage("assets/ranger archer/jump/right jump_0.png");
   leftJump = loadImage("assets/ranger archer/jump/left jump_0.png");
   
+  //loading monster image
+  rightSlime = loadImage("assets/ranger archer/slime/right slime.gif");
+  leftSlime = loadImage("assets/ranger archer/slime/left slime.gif");
+
   //loading map image
+  bk = loadImage("assets/backgroud.jpg");
 
   //loading sound affects
 
@@ -63,6 +73,8 @@ function setup() {
                   ax: 0, ay: 0, speed: 4,};
   characterImg = rightIdle; 
 
+  slimePos = {x: width/3*2,  y: ground + 20, width: 40, height: 25, dx: 1, dy: 1};
+
   instructionButton = new Clickable();
   instructionButton.locate(width - 30, 10);
   instructionButton.resize(20,20);
@@ -70,10 +82,10 @@ function setup() {
   instructionButton.strokeWeight = 0;
   instructionButton.onHover = function(){
     instruction.isAlive = true;
-  }
+  };
   instructionButton.onOutside = function(){
     instruction.isAlive = false;
-  }
+  };
 }
 
 function draw() {
@@ -95,6 +107,7 @@ function draw() {
   walking(); 
   jumping();
   displayCharacter();
+  displaySlime();
 } 
 
 function instructions(){
@@ -104,22 +117,51 @@ function instructions(){
     rect(width-200, 30, 170, 100);
     fill("#1D1912");
     textFont(pixleFont);
-    text("Use 'a', 'd', to move left or right and space to jump. ", width-190, 40, width-450, 200);
-    text("Use 'k' to attack. ", width-190, 100, width-450, 200);
+    text("Use 'a', 'd', to move left or right and space to jump. ", width-190, 40, 150, 100);
+    text("Use 'k' to attack. ", width-190, 100, 170, 200);
   }
 }
 
 function displayCharacter(){
   if (characterImg === rightCloseAttack){
-    image(characterImg, characterPos.x+9, characterPos.y, 63, characterSzie);
+    characterPos.x += 9;
+    image(characterImg, characterPos.x, characterPos.y, 63, characterSzie);
   }
   else if (characterImg === leftCloseAttack){
-    image(characterImg, characterPos.x-24, characterPos.y, 63, characterSzie);
+    characterPos.x -= 24;
+    image(characterImg, characterPos.x, characterPos.y, 63, characterSzie);
   }
   else{
     image(characterImg, characterPos.x, characterPos.y, characterSzie, characterSzie);
   }
 }
+
+function displaySlime(){
+  slimePos.x += slimePos.dx;
+  image(rightSlime, slimePos.x,  slimePos.y, slimePos.width, slimePos.height);
+  if (slimePos.x >= width/4*3){
+    slimePos.dx *= -1;
+  }
+  else if (slimePos.x < width/3*2){
+    slimePos.dx *= -1;
+  }
+}
+
+function collidChecking(){
+  let platformHit = false;
+  platformHit = collidePointRect(characterPos.x + characterSzie, characterPos.y + characterSzie, width/3*2, height/3*2, width/10, height/35);
+  if(platformHit){ //change color!
+    textSize(100); 
+    text("successful", width/2, height/2);
+    characterPos.dx -= 0.5;
+
+  }
+  else{
+    fill("nah", width/2, height/2);
+  }
+}
+
+//rect(width/3*2, height/3*2, width/10, height/35);
 
 function jumping(){
   //acceleration affects velocity
@@ -130,21 +172,17 @@ function jumping(){
   characterPos.x += characterPos.dx;
   characterPos.y += characterPos.dy;
 
+  collidChecking();
   //gravity, if needed
   if (characterPos.y <= ground) {
     characterPos.dy += 0.5;
   }
   
-  // if (characterPos.y <= 500){
-  //   characterPos.ay += 0.5;
-  // } 
-
   else {
     characterPos.y = ground;
     characterPos.dy = 0;
   }
-//rect(width/3*2, height/3*2, width/10, height/35);
-// windowHeight/3*2 + windowHeight/35
+
 
   //remove thrust from jump
   characterPos.ay = 0;
@@ -152,9 +190,12 @@ function jumping(){
 
 //movement controls and animation swtiching
 function keyPressed(){
-  if (keyCode === 32){  //jump
+  let count = 0;
+  if (keyCode === 32 && count <= 2){  //jump
     // characterPos.y -= characterPos.jumpheight;
     characterPos.ay = -12;
+    count += 1;
+  
     if (characterImg === rightWalk || characterImg === rightIdle){
       characterImg = rightJump; 
     } 
@@ -171,7 +212,7 @@ function keyPressed(){
     // characterPos.x -= characterPos.speed; 
     characterImg = leftWalk; 
   }
-  if (keyCode === 75) {  //k
+  if (keyCode === 75) {  //k attack
     if (characterImg === leftWalk || characterImg === rightIdle){
       characterImg = rightCloseAttack; 
     } 
@@ -206,7 +247,7 @@ function keyReleased(){
   }
 }
 
-//other movement & coliding checking
+//other movement & colliding checking
 function walking(){ 
   if (keyIsDown(68)) {  //d left
     characterPos.x += characterPos.speed;  
