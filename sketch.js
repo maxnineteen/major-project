@@ -26,6 +26,7 @@ let rightJump;
 let leftJump;
 let leftDead;
 let rightDead;
+let jumpState = false;
 let count = 0;
 
 //map and display variables
@@ -281,18 +282,17 @@ function keyPressed(){
   if (characterLife > 0){
     if (keyCode === 32 && count < 2){  //jump
       // character.y -= character.jumpheight;
+      jumpState = true;
       jumping();
       character.ay = -10;
       count += 1;
       console.log(count);
-    
       if (characterImg === rightWalk || characterImg === rightIdle){
         characterImg = rightJump; 
       } 
       if (characterImg === leftWalk || characterImg === leftIdle){
         characterImg = leftJump; 
       }
-      
     }
     
     if (keyCode === 68) {  //d left
@@ -323,6 +323,7 @@ function keyReleased(){
       if (characterImg === leftJump){
         characterImg = leftIdle;
       }
+      jumpState = false;
     }       
     if (keyCode === 68) {  //d
       characterImg = rightIdle;
@@ -345,19 +346,15 @@ function walking(){
   if (characterLife > 0){
     if (keyIsDown(68)) {  //d left
       character.x += character.speed;  
-      if (characterImg === leftJump){
-        characterImg = leftJump;
-      }
-      else{
+      if (jumpState === false){
         characterImg = rightWalk;     
       }
     }
     if (keyIsDown(65)) {  //a right
       character.x -= character.speed; 
-      if (characterImg === rightJump){
-        characterImg = rightJump;
-      }
-      characterImg = leftWalk; 
+      if (jumpState === false){
+        characterImg = leftWalk; 
+      }     
     }
   }
 }
